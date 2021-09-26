@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, Menu, MenuItem, dialog } = require('electron');
 const path = require('path');
 
+app.disableHardwareAcceleration();
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
@@ -12,8 +14,8 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      //nodeIntegration: true
+      preload: path.join(__dirname, "preload.js"),
     }
   });
 
@@ -55,7 +57,10 @@ ipcMain.handle('electron-menu', async (event, sources) => {
   sources.forEach(source => {
         videoOptionsMenu.append(new MenuItem({ 
             label: source.name, 
-            click: () => event.sender.send('menuselect', source)
+            click: () => {
+              console.info(source) 
+              event.sender.send('menuselect', source);
+            }
         }));
     });
   videoOptionsMenu.popup();
